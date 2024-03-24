@@ -1,0 +1,20 @@
+.puzzle-game {
+  text-align: center;
+}
+
+.puzzle-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 2px;
+  margin: 20px auto;
+  max-width: 400px;
+}
+
+.puzzle-piece {
+  cursor: pointer;
+}
+
+.puzzle-solved {
+  font-size: 24px;
+  color: green;
+}

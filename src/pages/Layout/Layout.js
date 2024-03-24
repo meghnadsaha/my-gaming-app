@@ -8,6 +8,9 @@ function Layout() {
          <Link to="/">Home</Link>
         <a href="/TriviaQuizGame">TriviaQuizGame</a>
         <a href="/MemoryCardGame">MemoryCardGame</a>
+        <a href="/PuzzleGame">PuzzleGame</a>
+
+        
         <a href="/dsf">Contact</a>
     </div>
 
