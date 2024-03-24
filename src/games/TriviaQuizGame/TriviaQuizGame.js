@@ -1,75 +1,85 @@
-import React, { useState, useEffect } from 'react';
 import './TriviaQuizGame.css';
+import React, { useState } from 'react';
+
+const questions = [
+  {
+    question: 'What is the capital of France?',
+    options: ['Paris', 'London', 'Berlin', 'Madrid'],
+    answer: 'Paris',
+  },
+  {
+    question: 'Which planet is known as the Red Planet?',
+    options: ['Jupiter', 'Mars', 'Saturn', 'Neptune'],
+    answer: 'Mars',
+  },
+  {
+    question: 'What is the largest mammal in the world?',
+    options: ['Elephant', 'Blue Whale', 'Giraffe', 'Hippopotamus'],
+    answer: 'Blue Whale',
+  },
+];
 
 const TriviaQuizGame = () => {
-  const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [userAnswers, setUserAnswers] = useState([]);
+  const [selectedOption, setSelectedOption] = useState('');
   const [score, setScore] = useState(0);
+  const [showScore, setShowScore] = useState(false);
 
-  useEffect(() => {
-    fetchQuestions();
-  }, []);
-
-  const fetchQuestions = async () => {
-    const response = await fetch('http://localhost:8000/results');
-    const data = await response.json();
-    setQuestions(data);
+  const handleOptionSelect = (option) => {
+    setSelectedOption(option);
   };
 
-  const handleAnswerClick = (answer) => {
-    const isCorrect = answer === questions[currentQuestion].correct_answer;
-    setUserAnswers([...userAnswers, { question: questions[currentQuestion].question, answer, isCorrect }]);
-    if (isCorrect) {
+  const handleNextQuestion = () => {
+    if (selectedOption === questions[currentQuestion].answer) {
       setScore(score + 1);
     }
-    if (currentQuestion < questions.length) {
-      setCurrentQuestion(currentQuestion + 1);
+
+    setSelectedOption('');
+    const nextQuestion = currentQuestion + 1;
+    if (nextQuestion < questions.length) {
+      setCurrentQuestion(nextQuestion);
+    } else {
+      setShowScore(true);
     }
   };
 
   const restartQuiz = () => {
     setCurrentQuestion(0);
-    setUserAnswers([]);
+    setSelectedOption('');
     setScore(0);
+    setShowScore(false);
   };
 
-  if (!questions) {
-    return <div>Loading...</div>;
-  }
-
-  if (currentQuestion === questions.length) {
-    return (
-      <div>
-        <h1>Quiz Complete!</h1>
-        <p>Your Score: {score}/{questions.length}</p>
-        <button onClick={restartQuiz}>Restart Quiz</button>
-      </div>
-    );
-  }
-
   return (
-    
-    <div>
-      <h1>Trivia Quiz Game</h1>
-      <p>Question {currentQuestion + 1}/{questions.length}</p>
-      <h2>{questions[currentQuestion].question}</h2>
-      <div>
-        {shuffleArray([...questions[currentQuestion].incorrect_answers, questions[currentQuestion].correct_answer]).map((answer) => (
-          <button key={answer} onClick={() => handleAnswerClick(answer)}>{answer}</button>
-        ))}
-      </div>
+    <div className="quiz-container">
+      {!showScore ? (
+        <>
+          <div className="question">{questions[currentQuestion].question}</div>
+          <div className="options">
+            {questions[currentQuestion].options.map((option, index) => (
+              <button
+                key={index}
+                className={`option ${selectedOption === option ? 'selected' : ''}`}
+                onClick={() => handleOptionSelect(option)}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+          <button className="next-button" onClick={handleNextQuestion} disabled={!selectedOption}>
+            Next
+          </button>
+        </>
+      ) : (
+        <div className="score-container">
+          <div className="score">You scored {score} out of {questions.length}</div>
+          <button className="restart-button" onClick={restartQuiz}>
+            Restart Quiz
+          </button>
+        </div>
+      )}
     </div>
   );
-};
-
-const shuffleArray = (array) => {
-  const shuffledArray = [...array];
-  for (let i = shuffledArray.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-  }
-  return shuffledArray;
 };
 
 export default TriviaQuizGame;
